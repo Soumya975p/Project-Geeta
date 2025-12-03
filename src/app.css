@@ -1,0 +1,41 @@
+@import '/css/bootstrap.css';
+@import '/css/sanskrit.css';
+
+:root {
+  font-family: 'Lato', 'Noto Sans Devanagari', sans-serif;
+  line-height: 1.8;
+  font-weight: 400;
+  font-size: 15.8px;
+  -webkit-font-smoothing: antialiased;
+  overflow-wrap: break-word;
+  color: #3E4999;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: #ffffff;
+  color: #3E4999;
+  font-family: 'Lato', 'Noto Sans Devanagari', sans-serif;
+  font-size: 15.8px;
+  font-weight: 400;
+  line-height: 1.8;
+  overflow-wrap: break-word;
+}
+
+#app {
+  width: 100%;
+  margin: 0 auto;
+}
+
+nav {
+  display: block;
+  unicode-bidi: isolate;
+}
