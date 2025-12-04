@@ -1,10 +1,12 @@
 <script>
   import AudioPopup from './AudioPopup.svelte';
   import VerseGrid from './VerseGrid.svelte';
+  import { onMount } from 'svelte';
 
   // State
   let view = 'chapters'; // 'chapters' or 'verses'
   let selectedChapter = 1;
+  let verseSection;
   
 
   // Popup State
@@ -15,23 +17,93 @@
   function viewChapter(chapter) {
     selectedChapter = chapter;
     view = 'verses';
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Smooth scroll to top when viewing verses
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 100);
   }
 
   function goBack() {
     view = 'chapters';
+    // Smooth scroll to top when going back to chapters
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 100);
   }
 
-  function handlePlay(event) {
-    const { verse } = event.detail;
-    // Mock data for audio
-    currentLyrics = verse === 'whole' ? 'Full chapter audio...' : 
-                    verse === 'end' ? 'Ending...' : 
-                    `Verse ${verse} Sanskrit text here...`;
-    currentSong = verse === 'whole' ? '/audio/chapter_full.mp3' :
-                  verse === 'end' ? '/audio/end.mp3' :
-                  `/audio/verse_${verse}.mp3`;
-    showPopup = true;
+  async function handlePlay(event) {
+    const { verse, chapterNumber } = event.detail;
+    
+    console.log('Playing verse:', verse, 'from chapter:', chapterNumber);
+    
+    // Fetch actual verse data from API
+    try {
+      // Use proxy to avoid CORS issues
+      const apiUrl = `/api/geeta.php?q=${chapterNumber}`;
+      console.log('Fetching from:', apiUrl);
+      
+      const response = await fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+        }
+      });
+      
+      console.log('API Response status:', response.status, response.ok);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      console.log('API Result received, data length:', result.data?.length);
+      console.log('First item:', result.data?.[0]);
+      
+      if (result.status === 200 && result.data && Array.isArray(result.data)) {
+        if (verse === 'whole' || verse === 'end') {
+          // For whole chapter or end, show all verses
+          const allLyrics = result.data
+            .filter(item => item.shlok_no && parseInt(item.shlok_no) > 0)
+            .map(item => item.lyrics)
+            .join('\n\n');
+          currentLyrics = allLyrics || `Chapter ${chapterNumber} ${verse === 'whole' ? 'full text' : 'ending'}`;
+          // Use music from first verse or fallback
+          const musicPath = result.data.find(item => item.music)?.music;
+          currentSong = musicPath ? `https://sanskrit.ie/${musicPath}` : `/audio/chapter_${chapterNumber}_full.mp3`;
+        } else {
+          // Find the specific verse
+          const verseData = result.data.find(item => parseInt(item.shlok_no) === verse);
+          console.log('Looking for verse:', verse, 'Found:', verseData);
+          
+          if (verseData) {
+            currentLyrics = verseData.lyrics || `Verse ${verse} text not available`;
+            // Construct full URL for music if it exists
+            currentSong = verseData.music ? `https://sanskrit.ie/${verseData.music}` : `/audio/chapter_${chapterNumber}_verse_${verse}.mp3`;
+            console.log('Setting lyrics length:', currentLyrics.length);
+            console.log('Music URL:', currentSong);
+          } else {
+            currentLyrics = `Chapter ${chapterNumber}, Verse ${verse} - Text not available`;
+            currentSong = `/audio/chapter_${chapterNumber}_verse_${verse}.mp3`;
+          }
+        }
+        showPopup = true;
+      } else {
+        console.warn('Unexpected API response:', result);
+        throw new Error('Invalid API response format');
+      }
+    } catch (error) {
+      console.error('Error fetching verse data:', error);
+      console.error('Error name:', error.name);
+      console.error('Error message:', error.message);
+      if (error.stack) console.error('Stack:', error.stack);
+      
+      // Show fallback data instead of error message
+      currentLyrics = verse === 'whole' ? `Full chapter ${chapterNumber} - API temporarily unavailable` : 
+                      verse === 'end' ? `End of chapter ${chapterNumber} - API temporarily unavailable` : 
+                      `Chapter ${chapterNumber}, Verse ${verse} - API temporarily unavailable. Please check your internet connection.`;
+      currentSong = '';
+      showPopup = true;
+    }
   }
 
 </script>

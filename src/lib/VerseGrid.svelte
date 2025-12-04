@@ -156,20 +156,61 @@
 </style> -->
 
 <script>
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
   export let chapterNumber = 1;
   
   const dispatch = createEventDispatcher();
   
-  // Verse counts for each chapter of Bhagavad Gita
-  const verseCountPerChapter = [47, 72, 43, 42, 29, 47, 30, 28, 34, 42, 55, 20, 34, 27, 20, 24, 28, 78];
-  
-  // Get verse count for current chapter
-  const verseCount = verseCountPerChapter[chapterNumber - 1] || 47;
-  let verses = Array.from({ length: verseCount }, (_, i) => i + 1);
+  let verses = [];
+  let loading = true;
+  let error = null;
+
+  // Fetch verses from API when component mounts or chapter changes
+  async function fetchVerses() {
+    loading = true;
+    error = null;
+    try {
+      // Use proxy to avoid CORS issues
+      const response = await fetch(`/api/geeta.php?q=${chapterNumber}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch verses');
+      }
+      const result = await response.json();
+      
+      // API returns: {"status":200,"message":"Data Listed","data":[...]}
+      if (result.status === 200 && result.data && Array.isArray(result.data)) {
+        // Filter verses with shlok_no > 0 (exclude chapter intro at shlok_no=0)
+        const verseData = result.data.filter(item => item.shlok_no && parseInt(item.shlok_no) > 0);
+        // Get unique verse numbers
+        const uniqueVerses = [...new Set(verseData.map(item => parseInt(item.shlok_no)))].sort((a, b) => a - b);
+        verses = uniqueVerses;
+        console.log(`Loaded ${verses.length} verses for chapter ${chapterNumber}`);
+      } else {
+        throw new Error('Invalid API response format');
+      }
+    } catch (err) {
+      console.error('Error fetching verses:', err);
+      error = err.message;
+      // Fallback to default verse counts if API fails
+      const verseCountPerChapter = [47, 72, 43, 42, 29, 47, 30, 28, 34, 42, 55, 20, 34, 27, 20, 24, 28, 78];
+      const verseCount = verseCountPerChapter[chapterNumber - 1] || 47;
+      verses = Array.from({ length: verseCount }, (_, i) => i + 1);
+    } finally {
+      loading = false;
+    }
+  }
+
+  onMount(() => {
+    fetchVerses();
+  });
+
+  // Refetch when chapter changes
+  $: if (chapterNumber) {
+    fetchVerses();
+  }
 
   function playVerse(verse) {
-    dispatch('play', { verse });
+    dispatch('play', { verse, chapterNumber });
   }
 </script>
 
@@ -187,6 +228,12 @@
       <p>Verse</p>
     </div>
   </div>
+
+  {#if loading}
+    <div class="loading-message">Loading verses...</div>
+  {:else if error}
+    <div class="error-message">Error loading verses. Showing default layout.</div>
+  {/if}
 
   <div class="shlok_container">
     <div class="shlok_area">
@@ -379,5 +426,18 @@
     .shlok_num p {
         font-size: 30px;
     }
+  }
+
+  /* Loading and Error Messages */
+  .loading-message,
+  .error-message {
+    text-align: center;
+    padding: 2rem;
+    font-size: 1.2rem;
+    color: #bd003c;
+  }
+
+  .error-message {
+    color: #d9534f;
   }
 </style>
