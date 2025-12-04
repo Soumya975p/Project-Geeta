@@ -108,8 +108,14 @@
 
 </script>
 
-<div class="inner_background inner-pad" style="background-image: url('/images/gita_banner.png'); background-size: cover; background-position: top center; background-attachment: scroll; padding-bottom: 0;">
-  <h1 class="inner_head">BHAGAVAD GITA</h1>
+<div class="top-banner" style="background-image: url('/images/pic1.jpg'); background-size: cover; background-position: center center; background-attachment: fixed; min-height: 129px; width: 100%; position: relative;">
+</div>
+
+<div class="white-strip" style="background-color: #ffffff; width: 100%; height: 80px; position: relative;">
+</div>
+
+<div class="inner_background inner-pad" style="background-image: url('/images/gita_banner.png'); background-size: cover; background-position: top center; background-attachment: scroll; padding-bottom: 0; height: 400px;">
+  <h1 class="inner_head" style="font-family: edensor, 'Noto Sans Devanagari'; font-weight: 500; font-size: 7em; color: #3E4939; padding-bottom: 10px; margin-bottom: -.75em; text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25); justify-content: center; display: flex; position: inherit; z-index: 1; background-color: #ffffffa3; transform: translateY(-184px);">BHAGAVAD GITA</h1>
   <div class="container border_bg hero-container16" style="margin-bottom: 0;">
   </div>
 </div>
@@ -182,14 +188,14 @@
     padding: 0em 6em;
     display: grid;
     grid-template-columns: repeat(5, 147px);
-    grid-gap: 125px 190px;
+    grid-gap: 122px 84px;
     justify-content: center;
 }
 
 /* The Diamond Shape Logic */
 .chapter {
-    width: 180px;
-    height: 180px;
+    width: 147px;
+    height: 147px;
     overflow: hidden;
     border: 1px solid #928c8c;
     position: relative;
@@ -197,7 +203,6 @@
     border-radius: 15px;
     margin: 0;
     cursor: pointer;
-    background: #fff;
 }
 .chapter:hover { transform: rotate(45deg); }
 
