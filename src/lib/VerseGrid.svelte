@@ -180,7 +180,11 @@
       // API returns: {"status":200,"message":"Data Listed","data":[...]}
       if (result.status === 200 && result.data && Array.isArray(result.data)) {
         // Filter verses with shlok_no > 0 (exclude chapter intro at shlok_no=0)
-        const verseData = result.data.filter(item => item.shlok_no && parseInt(item.shlok_no) > 0);
+        // Also exclude shlok_no=99 which appears to be an end marker in the API data
+        const verseData = result.data.filter(item => {
+          const verseNum = parseInt(item.shlok_no);
+          return item.shlok_no && verseNum > 0 && verseNum < 99;
+        });
         // Get unique verse numbers
         const uniqueVerses = [...new Set(verseData.map(item => parseInt(item.shlok_no)))].sort((a, b) => a - b);
         verses = uniqueVerses;
