@@ -180,11 +180,7 @@
       // API returns: {"status":200,"message":"Data Listed","data":[...]}
       if (result.status === 200 && result.data && Array.isArray(result.data)) {
         // Filter verses with shlok_no > 0 (exclude chapter intro at shlok_no=0)
-        // Also exclude shlok_no=99 which appears to be an end marker in the API data
-        const verseData = result.data.filter(item => {
-          const verseNum = parseInt(item.shlok_no);
-          return item.shlok_no && verseNum > 0 && verseNum < 99;
-        });
+        const verseData = result.data.filter(item => item.shlok_no && parseInt(item.shlok_no) > 0);
         // Get unique verse numbers
         const uniqueVerses = [...new Set(verseData.map(item => parseInt(item.shlok_no)))].sort((a, b) => a - b);
         verses = uniqueVerses;
@@ -291,6 +287,7 @@
     padding-left: 5%;
     font-size: 16px; 
     margin-bottom: 10px;
+    transform:translateY(-100px)
   }
 
   /* Chapter Title */
@@ -304,6 +301,7 @@
     position: relative;
     margin: 0;
     text-transform: uppercase;
+    transform:translateY(-100px)
   }
 
   .shlok_head p::after {
@@ -323,15 +321,15 @@
     width: 100%;
     position: relative;
     margin-bottom: 2em;
-    border-top: 1px solid #bd003c;
-    border-bottom: 1px solid #bd003c;
+    /* border-top: 1px solid #bd003c;
+    border-bottom: 1px solid #bd003c; */
     background-color: rgba(189, 0, 60, 0.05);
   }
 
   .shlok_h p {
     padding: 1em 0;
     margin-left: 10%;
-    color: #bd003c;
+    /* color: #bd003c; */
     letter-spacing: 1px;
     font-size: 15px;
     font-weight: bold;

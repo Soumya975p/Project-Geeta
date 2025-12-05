@@ -183,7 +183,10 @@
     position: relative; 
     z-index: 1; 
 }
-.chapter_head p { text-align: center; padding: 1em 0em; font-size: 24px; color: #bd003c; letter-spacing: 1px; position: relative; font-weight: bold; text-decoration: underline;}
+.chapter_head p { text-align: center; padding: 1em 0em; font-size: 30px; color: #bd003c; letter-spacing: 1px; position: relative; font-weight:400; 
+   transform:translateY(-35px)
+   
+}
 .chapter_container { 
     padding: 0em 6em;
     display: grid;
@@ -272,8 +275,8 @@
 .shlok_head { text-align: center; margin-bottom: 20px;}
 
 .shlok_sort { 
-    border-top: 1px solid #bd003c;
-    border-bottom: 1px solid #bd003c;
+    /* border-top: 1px solid #bd003c;
+    border-bottom: 1px solid #bd003c; */
     padding: 0.5rem 2rem;
     text-align: left;
     margin-bottom: 2rem;
